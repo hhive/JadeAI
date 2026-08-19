@@ -18,6 +18,10 @@ function resume(revision = 2): Resume {
   };
 }
 
+function pdfResponse(headers?: HeadersInit): Response {
+  return new Response(new TextEncoder().encode('pdf'), { status: 200, headers });
+}
+
 describe('useExportWorkbench', () => {
   afterEach(cleanup);
 
@@ -51,7 +55,7 @@ describe('useExportWorkbench', () => {
     vi.mocked(fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(saved), { status: 200 }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200, headers: { 'Content-Disposition': 'attachment; filename="resume.pdf"' } }));
+      .mockResolvedValueOnce(pdfResponse({ 'Content-Disposition': 'attachment; filename="resume.pdf"' }));
     const { result } = renderHook(() => useExportWorkbench('resume-1'));
     await waitFor(() => expect(result.current.draft).not.toBeNull());
 
@@ -76,7 +80,7 @@ describe('useExportWorkbench', () => {
     vi.mocked(fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200 }));
+      .mockResolvedValueOnce(pdfResponse());
     const { result } = renderHook(() => useExportWorkbench('resume-1'));
     await waitFor(() => expect(result.current.draft).not.toBeNull());
 
@@ -108,7 +112,7 @@ describe('useExportWorkbench', () => {
     vi.mocked(fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
       .mockImplementationOnce(() => new Promise<Response>((resolve) => { resolveSave = resolve; }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200 }));
+      .mockResolvedValueOnce(pdfResponse());
     const { result } = renderHook(() => useExportWorkbench('resume-1'));
     await waitFor(() => expect(result.current.draft).not.toBeNull());
 
@@ -131,7 +135,7 @@ describe('useExportWorkbench', () => {
     vi.mocked(fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(saved), { status: 200 }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200 }));
+      .mockResolvedValueOnce(pdfResponse());
 
     function Harness() {
       const workbench = useExportWorkbench('resume-1');
@@ -174,7 +178,7 @@ describe('useExportWorkbench', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(saved3), { status: 200 }))
       .mockResolvedValueOnce(new Response('failed', { status: 500 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(saved4), { status: 200 }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200 }));
+      .mockResolvedValueOnce(pdfResponse());
     const { result } = renderHook(() => useExportWorkbench('resume-1'));
     await waitFor(() => expect(result.current.draft).not.toBeNull());
     await act(async () => { await result.current.primaryAction(); });
@@ -196,7 +200,7 @@ describe('useExportWorkbench', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(resume()), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(resume(3)), { status: 200 }))
       .mockResolvedValueOnce(new Response('failed', { status: 500 }))
-      .mockResolvedValueOnce(new Response(new Blob(['pdf']), { status: 200 }));
+      .mockResolvedValueOnce(pdfResponse());
     const { result } = renderHook(() => useExportWorkbench('resume-1'));
     await waitFor(() => expect(result.current.draft).not.toBeNull());
 
